@@ -25,32 +25,21 @@
     }
     * { box-sizing: border-box; }
 
-    html, body {
-      height: 100%;
-      margin: 0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Noto Sans", sans-serif;
+ 
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Noto Sans", sans-serif;
 
-      /* Fallback gradient if image fails */
-      background: radial-gradient(1200px 800px at 20% 10%, #101634 0%, var(--bg) 50%, #080d1a 100%);
+  /* Use the original image only — no overlay */
+  background-image: url("Blank%20Template%201.jpg");
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed; /* optional */
+  color: var(--text);
+}
 
-      /* === Background image (same folder as index.html) ===
-         - Spaces are encoded as %20
-         - A subtle overlay gradient is added first to improve text legibility
-      */
-      background-image:
-        radial-gradient(1200px 800px at 50% 60%, rgba(80, 0, 120, 0.45), rgba(8, 13, 26, 0.65)),
-        image-set(
-          url("Blank%20Template%201.jpg") type("image/jpeg") 1x
-          /* Optional high-DPI:
-             url("Blank%20Template%201@2x.jpg") type("image/jpeg") 2x
-          */
-        );
-      background-size: cover, cover;
-      background-position: center center, center center;
-      background-repeat: no-repeat, no-repeat;
-      background-attachment: fixed; /* parallax-like feel */
-      color: var(--text);
-    }
 
     .wrap {
       min-height: 100%;
