@@ -11,7 +11,7 @@
   <meta name="description" content="Live countdown to Jan 1, 2026 11:00 AM (IST).">
 
   <!-- Preload the background image for faster paint -->
-  <link rel="preload" as="image" href="assets/bg.jpg" imagesrcset="assets/bg.jpg">
+  <link rel="preload" as="image" href="Blank%20Template%201.jpg" />
 
   <style>
     :root {
@@ -33,24 +33,22 @@
       /* Fallback gradient if image fails */
       background: radial-gradient(1200px 800px at 20% 10%, #101634 0%, var(--bg) 50%, #080d1a 100%);
 
-      /* === Background image ===
-         1) Put your image at: assets/bg.jpg (or update URL below)
-         2) The image is centered & covers the viewport
-         3) No repeat
+      /* === Background image (same folder as index.html) ===
+         - Spaces are encoded as %20
+         - A subtle overlay gradient is added first to improve text legibility
       */
-      background-image: 
-        /* subtle overlay to improve legibility on top of the photo */
+      background-image:
         radial-gradient(1200px 800px at 50% 60%, rgba(80, 0, 120, 0.45), rgba(8, 13, 26, 0.65)),
         image-set(
-          url("assets/bg.jpg") type("image/jpeg") 1x
-          /* You can add a sharper version when available:
-             url("assets/bg@2x.jpg") type("image/jpeg") 2x
+          url("Blank%20Template%201.jpg") type("image/jpeg") 1x
+          /* Optional high-DPI:
+             url("Blank%20Template%201@2x.jpg") type("image/jpeg") 2x
           */
         );
       background-size: cover, cover;
       background-position: center center, center center;
       background-repeat: no-repeat, no-repeat;
-      background-attachment: fixed; /* gives a premium feel */
+      background-attachment: fixed; /* parallax-like feel */
       color: var(--text);
     }
 
@@ -93,7 +91,7 @@
       margin-top: 8px;
     }
     .block {
-      background: rgba(18, 24, 54, 0.82); /* slightly translucent over the image */
+      background: rgba(18, 24, 54, 0.82); /* translucent over image */
       border: 1px solid rgba(255,255,255,0.12);
       border-radius: 14px;
       padding: 16px 14px;
