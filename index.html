@@ -9,6 +9,10 @@
   />
   <title>Countdown | Something is coming</title>
   <meta name="description" content="Live countdown to Jan 1, 2026 11:00 AM (IST).">
+
+  <!-- Preload the background image for faster paint -->
+  <link rel="preload" as="image" href="assets/bg.jpg" imagesrcset="assets/bg.jpg">
+
   <style>
     :root {
       --bg: #0b1020;
@@ -20,13 +24,36 @@
       --danger: #ff6b6b;
     }
     * { box-sizing: border-box; }
+
     html, body {
       height: 100%;
       margin: 0;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Noto Sans", sans-serif;
+
+      /* Fallback gradient if image fails */
       background: radial-gradient(1200px 800px at 20% 10%, #101634 0%, var(--bg) 50%, #080d1a 100%);
+
+      /* === Background image ===
+         1) Put your image at: assets/bg.jpg (or update URL below)
+         2) The image is centered & covers the viewport
+         3) No repeat
+      */
+      background-image: 
+        /* subtle overlay to improve legibility on top of the photo */
+        radial-gradient(1200px 800px at 50% 60%, rgba(80, 0, 120, 0.45), rgba(8, 13, 26, 0.65)),
+        image-set(
+          url("assets/bg.jpg") type("image/jpeg") 1x
+          /* You can add a sharper version when available:
+             url("assets/bg@2x.jpg") type("image/jpeg") 2x
+          */
+        );
+      background-size: cover, cover;
+      background-position: center center, center center;
+      background-repeat: no-repeat, no-repeat;
+      background-attachment: fixed; /* gives a premium feel */
       color: var(--text);
     }
+
     .wrap {
       min-height: 100%;
       display: grid;
@@ -36,11 +63,11 @@
     .card {
       width: 100%;
       max-width: 880px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
-      border: 1px solid rgba(255,255,255,0.08);
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+      border: 1px solid rgba(255,255,255,0.10);
       border-radius: 18px;
       padding: 32px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.10);
       backdrop-filter: blur(6px);
     }
     .title {
@@ -66,8 +93,8 @@
       margin-top: 8px;
     }
     .block {
-      background: var(--card);
-      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(18, 24, 54, 0.82); /* slightly translucent over the image */
+      border: 1px solid rgba(255,255,255,0.12);
       border-radius: 14px;
       padding: 16px 14px;
       text-align: center;
@@ -102,11 +129,12 @@
       align-items: center;
       padding: 8px 12px;
       border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.14);
       color: var(--muted);
       font-size: 13px;
       margin-top: 16px;
-      background: rgba(255,255,255,0.04);
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(4px);
     }
     .cta {
       display: inline-block;
@@ -142,6 +170,7 @@
 
     @media (max-width: 640px) {
       .grid { grid-template-columns: repeat(2, 1fr); }
+      .card { padding: 24px; }
     }
   </style>
 </head>
@@ -182,27 +211,18 @@
       <button class="cta" id="ctaBtn" disabled>Coming Soon</button>
 
       <p class="deadline" id="deadlineText">Target: Jan 1, 2026 — 11:00 AM (IST)</p>
-      <p class="footer" id="footerText">This timer auto-updates every second for all users.</p>
     </div>
   </div>
 
   <script>
     (function () {
       // === Configuration ===
-      // Target in IST (GMT+05:30). You can change this to any timezone-aware string.
-      // Example: "2026-01-01T11:00:00+05:30"
       const TARGET_ISO = "2026-01-01T11:00:00+05:30";
 
-      // Optional: Allow overriding via URL, e.g. ?target=2026-01-01T11:00:00+05:30
       const params = new URLSearchParams(window.location.search);
       const override = params.get("target");
       const target = new Date(override || TARGET_ISO);
 
-      // For progress bars:
-      const nowStart = Date.now();
-      const totalMs = Math.max(target.getTime() - nowStart, 1); // avoid divide-by-zero
-
-      // DOM refs
       const elDays = document.getElementById("days");
       const elHours = document.getElementById("hours");
       const elMinutes = document.getElementById("minutes");
@@ -217,7 +237,7 @@
       const deadlineText = document.getElementById("deadlineText");
       const footerText = document.getElementById("footerText");
 
-      // Format the deadline text using user locale but keeping IST info
+      // Format the deadline text using IST
       try {
         const fmt = new Intl.DateTimeFormat(undefined, {
           year: "numeric", month: "short", day: "2-digit",
@@ -226,7 +246,7 @@
           timeZone: "Asia/Kolkata"
         });
         deadlineText.textContent = "Target: " + fmt.format(target) + " (IST)";
-      } catch (e) { /* keep default */ }
+      } catch (e) {}
 
       function pad(n) { return String(n).padStart(2, "0"); }
 
@@ -235,7 +255,6 @@
         let diff = target.getTime() - now.getTime();
 
         if (diff <= 0) {
-          // Countdown complete
           elDays.textContent = "0";
           elHours.textContent = "00";
           elMinutes.textContent = "00";
@@ -267,8 +286,6 @@
         elMinutes.textContent = pad(minutes);
         elSeconds.textContent = pad(seconds);
 
-        // Progress within current unit
-        // Days progress shows how far we've moved through today's 24 hours
         const dayMs = 24 * 3600 * 1000;
         const hourMs = 3600 * 1000;
         const minuteMs = 60 * 1000;
@@ -285,16 +302,8 @@
         secondsProgress.style.width = ((secondMs - secondRemainingMs) / secondMs * 100).toFixed(2) + "%";
       }
 
-      // First paint synchronously to prevent flashing 00:00
       update();
-      // Update every 250ms for a smoother seconds progress bar
       const timer = setInterval(update, 250);
-
-      // Safety: clear interval if the page becomes hidden for long (battery friendly)
-      document.addEventListener("visibilitychange", () => {
-        if (document.hidden) { /* no-op here, keeping it simple */ }
-      });
-      // Defensive: stop updates when unloaded
       window.addEventListener("beforeunload", () => clearInterval(timer));
     })();
   </script>
